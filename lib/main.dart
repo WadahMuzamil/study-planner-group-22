@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 void main() {
@@ -19,18 +18,48 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  // LOGIC: Store study goals
+  List<Map<String, dynamic>> goals = [
+    {'subject': 'Dart Programming', 'hours': 3, 'done': false},
+    {'subject': 'Database Systems', 'hours': 2, 'done': false},
+    {'subject': 'Mobile App Development', 'hours': 4, 'done': false},
+  ];
+
+  // LOGIC: Add a sample goal
+  void addGoal() {
+    setState(() {
+      goals.add({'subject': 'Software Engineering', 'hours': 2, 'done': false});
+    });
+  }
+
+  // LOGIC: Mark a goal as done or not done
+  void toggleGoal(int index) {
+    setState(() {
+      goals[index]['done'] = !goals[index]['done'];
+    });
+  }
+
+  // LOGIC: Delete a goal
+  void deleteGoal(int index) {
+    setState(() {
+      goals.removeAt(index);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     // STATIC: Main screen
     return Scaffold(
-
       // STATIC: AppBar
-      appBar: AppBar(
-        title: const Text('My Study Planner'),
-      ),
+      appBar: AppBar(title: const Text('My Study Planner')),
 
       // STATIC: Screen body
       body: Padding(
@@ -38,39 +67,55 @@ class MyHomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             // STATIC: Heading
             const Text(
               'My Study Goals',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 15),
 
-            // STATIC: First goal card
-            const Card(
-              child: ListTile(
-                title: Text('Dart Programming'),
-                subtitle: Text('3 hours'),
-              ),
-            ),
+            // CONNECTION 1: Connect goal data to the screen
+            Expanded(
+              child: ListView.builder(
+                itemCount: goals.length,
+                itemBuilder: (context, index) {
+                  final goal = goals[index];
 
-            // STATIC: Second goal card
-            const Card(
-              child: ListTile(
-                title: Text('Database Systems'),
-                subtitle: Text('2 hours'),
-              ),
-            ),
+                  return Card(
+                    child: ListTile(
+                      // CONNECTION 2: Connect user actions to logic
+                      onTap: () {
+                        toggleGoal(index);
+                      },
 
-            // STATIC: Third goal card
-            const Card(
-              child: ListTile(
-                title: Text('Mobile App Development'),
-                subtitle: Text('4 hours'),
+                      leading: Checkbox(
+                        value: goal['done'],
+                        onChanged: (value) {
+                          toggleGoal(index);
+                        },
+                      ),
+
+                      title: Text(
+                        goal['subject'],
+                        style: TextStyle(
+                          decoration: goal['done']
+                              ? TextDecoration.lineThrough
+                              : TextDecoration.none,
+                        ),
+                      ),
+
+                      subtitle: Text('${goal['hours']} hours'),
+
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          deleteGoal(index);
+                        },
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -79,7 +124,7 @@ class MyHomePage extends StatelessWidget {
 
       // STATIC: Floating Action Button
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: addGoal,
         child: const Icon(Icons.add),
       ),
     );
